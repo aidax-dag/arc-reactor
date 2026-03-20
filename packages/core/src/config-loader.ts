@@ -19,5 +19,10 @@ export function loadConfig(overrides: Partial<ArcReactorConfig> = {}): ArcReacto
     projectConfig = JSON.parse(readFileSync(projectPath, 'utf-8'));
   }
 
-  return { ...DEFAULT_CONFIG, ...globalConfig, ...projectConfig, ...overrides };
+  const merged = { ...DEFAULT_CONFIG, ...globalConfig, ...projectConfig, ...overrides };
+  // Ensure outputDir is always resolved at call time, not module load time
+  if (!overrides.outputDir && !projectConfig.outputDir && !globalConfig.outputDir) {
+    merged.outputDir = process.cwd();
+  }
+  return merged;
 }
