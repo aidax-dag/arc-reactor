@@ -3,6 +3,8 @@ import type { TeamType } from '../types/task.js';
 import { createFrontendTeam } from './frontend-team.js';
 import { createBackendTeam } from './backend-team.js';
 import { createQaTeam } from './qa-team.js';
+import { createDesignTeam } from './design-team.js';
+import { createDevopsTeam } from './devops-team.js';
 
 export class TeamRegistry {
   private teams: Map<TeamType, Team>;
@@ -14,6 +16,8 @@ export class TeamRegistry {
       frontend: createFrontendTeam,
       backend: createBackendTeam,
       qa: createQaTeam,
+      design: createDesignTeam,
+      devops: createDevopsTeam,
     };
 
     for (const type of enabledTeams) {

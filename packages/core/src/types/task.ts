@@ -10,7 +10,7 @@ export interface Task {
   acceptanceCriteria: string[];
 }
 
-export type TeamType = 'frontend' | 'backend' | 'qa';
+export type TeamType = 'frontend' | 'backend' | 'qa' | 'design' | 'devops';
 
 export interface TaskResult {
   taskId: string;
