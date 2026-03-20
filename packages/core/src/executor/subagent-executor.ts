@@ -1,4 +1,6 @@
 import { execFileSync } from 'node:child_process';
+import { readdirSync, statSync } from 'node:fs';
+import { join, relative } from 'node:path';
 import type { Executor } from './executor.js';
 import type { Task, TaskResult, ExecutionContext, FileChange } from '../types/task.js';
 import type { Team } from '../types/team.js';
@@ -14,6 +16,9 @@ export class SubagentExecutor implements Executor {
   async execute(task: Task, team: Team, context: ExecutionContext): Promise<TaskResult> {
     const taskPrompt = this.buildPrompt(task, context);
 
+    // Snapshot files before execution
+    const beforeFiles = this.scanFiles(context.projectRoot);
+
     try {
       const stdout = execFileSync('claude', [
         '--print',
@@ -23,11 +28,13 @@ export class SubagentExecutor implements Executor {
       ], {
         cwd: context.projectRoot,
         encoding: 'utf-8',
-        timeout: 120_000,
+        timeout: 180_000,
         maxBuffer: 10 * 1024 * 1024,
       });
 
-      const outputs = this.getFileChanges(context.projectRoot);
+      // Snapshot after and diff
+      const afterFiles = this.scanFiles(context.projectRoot);
+      const outputs = this.diffSnapshots(beforeFiles, afterFiles);
 
       return {
         taskId: task.id,
@@ -61,26 +68,48 @@ export class SubagentExecutor implements Executor {
     return prompt;
   }
 
-  private getFileChanges(projectRoot: string): FileChange[] {
-    try {
-      const diff = execFileSync('git', ['diff', '--name-status'], {
-        cwd: projectRoot,
-        encoding: 'utf-8',
-      });
+  private scanFiles(dir: string, base?: string): Map<string, number> {
+    const root = base ?? dir;
+    const files = new Map<string, number>();
 
-      return diff
-        .trim()
-        .split('\n')
-        .filter(line => line.length > 0)
-        .map(line => {
-          const [status, ...pathParts] = line.split('\t');
-          const path = pathParts.join('\t');
-          const action = status === 'A' ? 'create' : status === 'D' ? 'delete' : 'modify';
-          return { path, action } as FileChange;
-        });
+    try {
+      for (const entry of readdirSync(dir)) {
+        if (entry === 'node_modules' || entry === '.git') continue;
+        const fullPath = join(dir, entry);
+        const stat = statSync(fullPath);
+        if (stat.isDirectory()) {
+          for (const [k, v] of this.scanFiles(fullPath, root)) {
+            files.set(k, v);
+          }
+        } else {
+          files.set(relative(root, fullPath), stat.mtimeMs);
+        }
+      }
     } catch {
-      return [];
+      // directory might not exist yet
     }
+
+    return files;
+  }
+
+  private diffSnapshots(before: Map<string, number>, after: Map<string, number>): FileChange[] {
+    const changes: FileChange[] = [];
+
+    for (const [path, mtime] of after) {
+      if (!before.has(path)) {
+        changes.push({ path, action: 'create' });
+      } else if (before.get(path) !== mtime) {
+        changes.push({ path, action: 'modify' });
+      }
+    }
+
+    for (const path of before.keys()) {
+      if (!after.has(path)) {
+        changes.push({ path, action: 'delete' });
+      }
+    }
+
+    return changes;
   }
 }
 
