@@ -1,0 +1,19 @@
+{
+  "name": "arc-reactor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI Company OS — multi-team orchestration engine for product development",
+  "workspaces": [
+    "packages/core",
+    "packages/cli"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspace=packages/cli",
+    "test": "npm run test --workspaces",
+    "lint": "eslint . --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "author": "Kevin",
+  "license": "MIT"
+}

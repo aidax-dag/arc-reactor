@@ -1,0 +1,21 @@
+{
+  "name": "@arc-reactor/cli",
+  "version": "0.1.0",
+  "description": "Arc-Reactor CLI",
+  "bin": {
+    "arc-reactor": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --test dist/**/*.test.js"
+  },
+  "dependencies": {
+    "@arc-reactor/core": "0.1.0",
+    "commander": "^13.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
