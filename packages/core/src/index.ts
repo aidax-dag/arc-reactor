@@ -1,0 +1,25 @@
+export type {
+  Task,
+  TaskResult,
+  TaskStatus,
+  TeamType,
+  FileChange,
+  TestResult,
+  Wave,
+  GoalAnalysis,
+  ExecutionPlan,
+  ExecutionContext,
+  ExecutionResult,
+  QualityReport,
+  QualityCheck,
+} from './types/task.js';
+
+export type { Team } from './types/team.js';
+export type { ArcReactorConfig } from './types/config.js';
+export { DEFAULT_CONFIG } from './types/config.js';
+export type { Feature, UserScenario, DataField, TaskSpec, ProtocolSpec } from './types/feature.js';
+
+export { TeamRegistry } from './teams/team-registry.js';
+export { createFrontendTeam } from './teams/frontend-team.js';
+export { createBackendTeam } from './teams/backend-team.js';
+export { createQaTeam } from './teams/qa-team.js';
