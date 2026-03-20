@@ -21,7 +21,7 @@ export interface ArcReactorConfig {
 }
 
 export const DEFAULT_CONFIG: ArcReactorConfig = {
-  mode: 'auto',
+  mode: 'subagent',
   model: 'claude-sonnet-4-6',
   ceoModel: 'claude-opus-4-6',
 

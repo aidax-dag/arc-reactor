@@ -36,7 +36,7 @@ export class APIExecutor implements Executor {
 
   constructor(config: ArcReactorConfig) {
     this.config = config;
-    this.client = new Anthropic({ apiKey: config.apiKey });
+    this.client = config.apiKey ? new Anthropic({ apiKey: config.apiKey }) : new Anthropic();
   }
 
   async execute(task: Task, team: Team, context: ExecutionContext): Promise<TaskResult> {

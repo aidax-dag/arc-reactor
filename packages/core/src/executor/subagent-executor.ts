@@ -18,7 +18,7 @@ export class SubagentExecutor implements Executor {
       const stdout = execFileSync('claude', [
         '--print',
         '--allowedTools', 'Read,Write,Edit,Bash',
-        '--systemPrompt', team.systemPrompt,
+        '--system-prompt', team.systemPrompt,
         taskPrompt,
       ], {
         cwd: context.projectRoot,

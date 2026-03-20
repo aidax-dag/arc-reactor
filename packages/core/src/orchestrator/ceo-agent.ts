@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { execFileSync } from 'node:child_process';
 import type { ExecutionPlan } from '../types/task.js';
 import type { ArcReactorConfig } from '../types/config.js';
 import { parseExecutionPlan } from './task-decomposer.js';
@@ -60,16 +61,40 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
   },
 };
 
+const CEO_SUBAGENT_PROMPT = `${CEO_SYSTEM_PROMPT}
+
+You MUST respond with ONLY a valid JSON object (no markdown, no explanation, no code fences).
+The JSON must have these fields:
+- summary (string)
+- components (string array)
+- concerns (string array)
+- constraints (string array)
+- estimatedComplexity ("simple" | "medium" | "complex")
+- tasks (array of objects with: id, title, description, team, dependencies, priority, acceptanceCriteria)`;
+
 export class CEOAgent {
-  private client: Anthropic;
   private config: ArcReactorConfig;
+  private client?: Anthropic;
 
   constructor(config: ArcReactorConfig) {
     this.config = config;
-    this.client = new Anthropic({ apiKey: config.apiKey });
+    if (config.mode === 'api' || config.mode === 'auto') {
+      this.client = config.apiKey ? new Anthropic({ apiKey: config.apiKey }) : new Anthropic();
+    }
   }
 
   async analyze(goal: string): Promise<ExecutionPlan> {
+    if (this.config.mode === 'subagent') {
+      return this.analyzeViaSubagent(goal);
+    }
+    return this.analyzeViaAPI(goal);
+  }
+
+  private async analyzeViaAPI(goal: string): Promise<ExecutionPlan> {
+    if (!this.client) {
+      this.client = this.config.apiKey ? new Anthropic({ apiKey: this.config.apiKey }) : new Anthropic();
+    }
+
     const response = await this.client.messages.create({
       model: this.config.ceoModel,
       max_tokens: 4096,
@@ -88,5 +113,35 @@ export class CEOAgent {
     }
 
     return parseExecutionPlan(goal, toolUse.input as Record<string, unknown>);
+  }
+
+  private async analyzeViaSubagent(goal: string): Promise<ExecutionPlan> {
+    const prompt = `Goal: ${goal}\n\nRespond with ONLY the JSON execution plan.`;
+
+    const stdout = execFileSync('claude', [
+      '--print',
+      '--system-prompt', CEO_SUBAGENT_PROMPT,
+      prompt,
+    ], {
+      encoding: 'utf-8',
+      timeout: 120_000,
+      maxBuffer: 10 * 1024 * 1024,
+    });
+
+    // Extract JSON from response (handle possible markdown fences)
+    let jsonStr = stdout.trim();
+    const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) {
+      jsonStr = jsonMatch[1].trim();
+    }
+
+    let raw: Record<string, unknown>;
+    try {
+      raw = JSON.parse(jsonStr);
+    } catch {
+      throw new Error(`CEO Agent returned invalid JSON. Output:\n${stdout.slice(0, 500)}`);
+    }
+
+    return parseExecutionPlan(goal, raw);
   }
 }

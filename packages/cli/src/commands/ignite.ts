@@ -13,10 +13,22 @@ import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
 
 function selectExecutor(config: ArcReactorConfig): Executor {
-  if (config.mode === 'api') return new APIExecutor(config);
-  if (config.mode === 'subagent') return new SubagentExecutor(config);
+  if (config.mode === 'api') {
+    if (!config.apiKey && !process.env.ANTHROPIC_API_KEY) {
+      throw new Error('API mode requires an API key. Set ANTHROPIC_API_KEY or apiKey in config.');
+    }
+    return new APIExecutor(config);
+  }
+  if (config.mode === 'subagent') {
+    if (!isClaudeCodeEnvironment()) {
+      throw new Error('Subagent mode requires Claude Code CLI. Install it or use --mode api with an API key.');
+    }
+    return new SubagentExecutor(config);
+  }
+  // auto: prefer subagent, fallback to api
   if (isClaudeCodeEnvironment()) return new SubagentExecutor(config);
-  return new APIExecutor(config);
+  if (config.apiKey || process.env.ANTHROPIC_API_KEY) return new APIExecutor(config);
+  throw new Error('No executor available. Install Claude Code CLI or set ANTHROPIC_API_KEY.');
 }
 
 export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>) {
