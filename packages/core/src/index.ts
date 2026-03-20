@@ -23,3 +23,7 @@ export { TeamRegistry } from './teams/team-registry.js';
 export { createFrontendTeam } from './teams/frontend-team.js';
 export { createBackendTeam } from './teams/backend-team.js';
 export { createQaTeam } from './teams/qa-team.js';
+
+export { CEOAgent } from './orchestrator/ceo-agent.js';
+export { buildWaves } from './orchestrator/dependency-analyzer.js';
+export { validateTaskRouting } from './orchestrator/task-router.js';
