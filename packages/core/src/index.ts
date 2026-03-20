@@ -27,3 +27,8 @@ export { createQaTeam } from './teams/qa-team.js';
 export { CEOAgent } from './orchestrator/ceo-agent.js';
 export { buildWaves } from './orchestrator/dependency-analyzer.js';
 export { validateTaskRouting } from './orchestrator/task-router.js';
+
+export type { Executor } from './executor/executor.js';
+export { APIExecutor } from './executor/api-executor.js';
+export { SubagentExecutor, isClaudeCodeEnvironment } from './executor/subagent-executor.js';
+export { WaveExecutor } from './executor/wave-executor.js';
