@@ -1,0 +1,90 @@
+import {
+  loadConfig,
+  CEOAgent,
+  TeamRegistry,
+  WaveExecutor,
+  APIExecutor,
+  SubagentExecutor,
+  isClaudeCodeEnvironment,
+  runQualityGate,
+  validateTaskRouting,
+} from '@arc-reactor/core';
+import type { ArcReactorConfig } from '@arc-reactor/core';
+import type { Executor } from '@arc-reactor/core';
+
+function selectExecutor(config: ArcReactorConfig): Executor {
+  if (config.mode === 'api') return new APIExecutor(config);
+  if (config.mode === 'subagent') return new SubagentExecutor(config);
+  if (isClaudeCodeEnvironment()) return new SubagentExecutor(config);
+  return new APIExecutor(config);
+}
+
+export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>) {
+  console.log('🔵 Arc-Reactor v0.1 "Ignition"');
+  console.log('━'.repeat(28));
+  console.log();
+  console.log(`📋 Goal: ${goal}`);
+  console.log();
+
+  const config = loadConfig(cliOptions);
+  const teamRegistry = new TeamRegistry(config.enabledTeams);
+
+  // Phase 1: CEO Analysis
+  console.log('🧠 CEO Agent analyzing goal...');
+  const ceo = new CEOAgent(config);
+  const plan = await ceo.analyze(goal);
+
+  console.log(`   Components: ${plan.analysis.components.join(', ')}`);
+  console.log(`   Complexity: ${plan.estimatedComplexity}`);
+  console.log(`   Waves: ${plan.waves.length}`);
+  console.log();
+
+  validateTaskRouting(plan.tasks, teamRegistry);
+
+  // Phase 2: Execute waves
+  const executor = selectExecutor(config);
+
+  const waveExecutor = new WaveExecutor(config, teamRegistry, {
+    onWaveStart: (wave: number, count: number) => {
+      const label = count > 1 ? 'parallel' : `${count} task`;
+      console.log(`⚡ Wave ${wave} (${label}):`);
+    },
+    onTaskComplete: (taskId: string, status: string, duration: number) => {
+      const task = plan.tasks.find((t: { id: string }) => t.id === taskId)!;
+      const icon = status === 'success' ? '✅' : '❌';
+      console.log(`   ├─ [${task.team}] ${task.title}  ${icon} (${Math.round(duration / 1000)}s)`);
+    },
+  });
+
+  const result = await waveExecutor.execute(plan, executor);
+
+  // Phase 3: Quality Gate
+  console.log();
+  console.log('🔍 Quality Gate:');
+  const report = await runQualityGate(result, config);
+  result.qualityReport = report;
+
+  for (const check of report.checks) {
+    const icon = check.passed ? '✅' : '❌';
+    console.log(`   ├─ ${check.name}: ${icon} ${check.details}`);
+  }
+
+  // Phase 4: Summary
+  console.log();
+  const statusIcon = report.passed ? '✅' : '❌';
+  console.log(`${statusIcon} ${report.passed ? 'Mission Complete' : 'Mission Failed'} (${Math.round(result.durationMs / 1000)}s total, ${result.totalTokensUsed.toLocaleString()} tokens)`);
+
+  if (result.results.some((r: { outputs: { path: string }[] }) => r.outputs.length > 0)) {
+    console.log();
+    console.log('📁 Files created:');
+    for (const r of result.results) {
+      for (const f of r.outputs) {
+        console.log(`   ├─ ${f.path}`);
+      }
+    }
+  }
+
+  if (!report.passed) {
+    process.exitCode = 1;
+  }
+}
