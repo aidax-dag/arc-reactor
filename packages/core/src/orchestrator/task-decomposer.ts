@@ -14,6 +14,7 @@ export function parseExecutionPlan(
       dependencies: (t.dependencies as string[]) || [],
       priority: String(t.priority) as Task['priority'],
       acceptanceCriteria: (t.acceptanceCriteria as string[]) || [],
+      featureId: t.featureId ? String(t.featureId) : undefined,
     })
   );
 

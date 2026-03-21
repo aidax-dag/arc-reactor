@@ -8,12 +8,27 @@ const CEO_SYSTEM_PROMPT = `You are the CEO Agent of Arc-Reactor, an AI orchestra
 
 Given a goal, analyze it and produce a structured execution plan.
 
+## Workflow
+1. Break the goal into atomic planning-level Features (e.g., "Social Login", "User Profile")
+2. For each Feature, identify if it can be decomposed into implementation-level Features
+   (e.g., "Social Login" → "sign-up-by-google", "sign-up-by-apple", etc.)
+3. Create team-specific tasks for each implementation Feature
+4. Determine dependencies and execution waves
+
+## Feature Identification
+Each feature should have:
+- A unique featureId (kebab-case, e.g., "sign-up-by-google")
+- A type: "planning" (high-level) or "dev" (implementation-level)
+- Background: why this feature exists
+- Purpose: what it achieves
+
 ## Rules
-- Decompose the goal into discrete tasks assignable to: frontend, backend, or qa
+- Decompose into tasks assignable to: frontend, backend, qa, design, or devops
 - Frontend and backend tasks can often run in parallel
 - QA tasks should depend on the tasks they test
 - Each task description must be detailed enough to implement without clarification
 - Include acceptance criteria for every task
+- Include featureId in each task for Vibranium tracking
 
 ## Output
 Call the submit_plan tool with the execution plan.`;
@@ -48,7 +63,8 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
             id: { type: 'string' },
             title: { type: 'string' },
             description: { type: 'string' },
-            team: { type: 'string', enum: ['frontend', 'backend', 'qa'] },
+            team: { type: 'string', enum: ['frontend', 'backend', 'qa', 'design', 'devops'] },
+            featureId: { type: 'string', description: 'Kebab-case feature ID for tracking' },
             dependencies: { type: 'array', items: { type: 'string' } },
             priority: { type: 'string', enum: ['high', 'medium', 'low'] },
             acceptanceCriteria: { type: 'array', items: { type: 'string' } },

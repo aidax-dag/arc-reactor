@@ -8,6 +8,7 @@ export interface Task {
   dependencies: string[];
   priority: 'high' | 'medium' | 'low';
   acceptanceCriteria: string[];
+  featureId?: string;              // Vibranium feature ID for tracking
 }
 
 export type TeamType = 'frontend' | 'backend' | 'qa' | 'design' | 'devops';
