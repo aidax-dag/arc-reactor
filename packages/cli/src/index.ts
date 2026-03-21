@@ -22,6 +22,7 @@ program
   .option('--auto-branch', 'Create a feature branch (feature/{id})')
   .option('--create-pr', 'Push branch and create PR after commit')
   .option('--feature-id <id>', 'Feature ID for branch naming and Vibranium tracking')
+  .option('--project-id <id>', 'Project ID for multi-project management')
   .action(async (goal: string, options: Record<string, string | boolean>) => {
     const config: Record<string, unknown> = {};
     if (options.teams) config.enabledTeams = (options.teams as string).split(',');
@@ -31,6 +32,7 @@ program
     if (options.autoBranch) config.autoBranch = true;
     if (options.createPr) config.createPR = true;
     if (options.featureId) config.featureId = options.featureId;
+    if (options.projectId) config.projectId = options.projectId;
 
     try {
       await ignite(goal, config as any);

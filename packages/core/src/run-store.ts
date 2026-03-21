@@ -8,6 +8,7 @@ const STORE_DIR = join(homedir(), '.arc-reactor', 'runs');
 export interface StoredRun {
   id: string;
   goal: string;
+  projectId?: string;
   status: 'running' | 'success' | 'failed';
   startedAt: string;
   completedAt?: string;
@@ -20,12 +21,13 @@ function ensureStoreDir(): void {
   }
 }
 
-export function createRun(goal: string): StoredRun {
+export function createRun(goal: string, projectId?: string): StoredRun {
   ensureStoreDir();
   const id = `run-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const run: StoredRun = {
     id,
     goal,
+    projectId,
     status: 'running',
     startedAt: new Date().toISOString(),
   };
@@ -55,19 +57,45 @@ export function getRun(id: string): StoredRun | null {
   return JSON.parse(readFileSync(path, 'utf-8'));
 }
 
-export function listRuns(limit = 50): StoredRun[] {
+export function listRuns(limit = 50, projectId?: string): StoredRun[] {
   ensureStoreDir();
   const files = readdirSync(STORE_DIR)
     .filter(f => f.endsWith('.json'))
     .sort()
-    .reverse()
-    .slice(0, limit);
+    .reverse();
 
-  return files.map(f => {
+  const runs: StoredRun[] = [];
+  for (const f of files) {
+    if (runs.length >= limit) break;
     const data = JSON.parse(readFileSync(join(STORE_DIR, f), 'utf-8'));
-    // Return without full result to keep listing lightweight
-    return { ...data, result: undefined };
-  });
+    if (projectId && data.projectId !== projectId) continue;
+    runs.push({ ...data, result: undefined });
+  }
+
+  return runs;
+}
+
+export function listProjects(): { projectId: string; runCount: number; lastRun: string }[] {
+  ensureStoreDir();
+  const projectMap = new Map<string, { count: number; lastRun: string }>();
+
+  for (const f of readdirSync(STORE_DIR).filter(f => f.endsWith('.json'))) {
+    const data = JSON.parse(readFileSync(join(STORE_DIR, f), 'utf-8'));
+    const pid = data.projectId || '(default)';
+    const existing = projectMap.get(pid);
+    if (!existing || data.startedAt > existing.lastRun) {
+      projectMap.set(pid, {
+        count: (existing?.count || 0) + 1,
+        lastRun: data.startedAt,
+      });
+    } else {
+      existing.count++;
+    }
+  }
+
+  return Array.from(projectMap.entries()).map(([projectId, { count, lastRun }]) => ({
+    projectId, runCount: count, lastRun,
+  }));
 }
 
 export function getRunDetail(id: string): StoredRun | null {

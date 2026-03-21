@@ -8,6 +8,7 @@ import { createDevopsTeam } from './devops-team.js';
 import { createSecurityTeam } from './security-team.js';
 import { createDocsTeam } from './docs-team.js';
 import { createProductTeam } from './product-team.js';
+import { applyCustomOverrides } from './custom-loader.js';
 
 export class TeamRegistry {
   private teams: Map<TeamType, Team>;
@@ -27,7 +28,8 @@ export class TeamRegistry {
     };
 
     for (const type of enabledTeams) {
-      this.teams.set(type, teamFactories[type]());
+      const team = teamFactories[type]();
+      this.teams.set(type, applyCustomOverrides(team));
     }
   }
 

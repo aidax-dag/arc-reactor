@@ -19,12 +19,19 @@ export interface ArcReactorConfig {
   outputDir: string;
   verbose: boolean;
 
+  // Project
+  projectId?: string;            // Project identifier for multi-project management
+
   // Git
   autoCommit: boolean;
   autoBranch: boolean;
   branchPrefix: string;
   createPR: boolean;
   featureId?: string;
+
+  // Notifications
+  webhookUrl?: string;            // Slack/Discord/custom webhook for alerts
+  webhookEvents?: ('run_complete' | 'run_failed' | 'quality_gate_failed')[];
 }
 
 export const DEFAULT_CONFIG: ArcReactorConfig = {

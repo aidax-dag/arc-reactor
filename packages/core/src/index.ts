@@ -43,8 +43,11 @@ export { runQualityGate } from './quality-gate/gate.js';
 export { loadConfig } from './config-loader.js';
 export { autoGit, commitResults, initGitIfNeeded, createFeatureBranch, pushBranch, createPR } from './git-ops.js';
 export type { GitOpsConfig } from './git-ops.js';
-export { createRun, updateRun, completeRun, getRun, listRuns, getRunDetail } from './run-store.js';
+export { createRun, updateRun, completeRun, getRun, listRuns, listProjects, getRunDetail } from './run-store.js';
 export type { StoredRun } from './run-store.js';
+export { sendNotification } from './notifications.js';
+export type { WebhookEvent } from './notifications.js';
+export { loadCustomTeam, saveCustomTeam, listCustomTeams, resetCustomTeam } from './teams/custom-loader.js';
 export {
   buildMemoryContext,
   loadGlobalPatterns,

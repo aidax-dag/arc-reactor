@@ -14,6 +14,7 @@ import {
   buildMemoryContext,
   learnFromExecution,
   ArcLogger,
+  sendNotification,
 } from '@arc-reactor/core';
 import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
@@ -52,7 +53,7 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
   console.log();
 
   const config = loadConfig(cliOptions);
-  const run = createRun(goal);
+  const run = createRun(goal, config.projectId);
   const logger = new ArcLogger(run.id, config.verbose);
   const teamRegistry = new TeamRegistry(config.enabledTeams);
 
@@ -222,6 +223,13 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
   console.log();
   console.log(`📝 Run saved: ${run.id} (learnings captured)`);
   console.log(`📊 Logs: ~/.arc-reactor/logs/`);
+
+  // Phase 7: Notifications
+  const notifEvent = report.passed ? 'run_complete' : 'run_failed';
+  await sendNotification(notifEvent, run.id, result, config);
+  if (!report.passed && report.checks.some(c => !c.passed && c.severity !== 'warning')) {
+    await sendNotification('quality_gate_failed', run.id, result, config);
+  }
 
   if (!report.passed) {
     process.exitCode = 1;
