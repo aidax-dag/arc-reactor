@@ -38,6 +38,8 @@ export type { Executor } from './executor/executor.js';
 export { APIExecutor } from './executor/api-executor.js';
 export { SubagentExecutor, isClaudeCodeEnvironment } from './executor/subagent-executor.js';
 export { WaveExecutor } from './executor/wave-executor.js';
+export { dryRunWave } from './executor/dry-run.js';
+export type { DryRunResult } from './executor/dry-run.js';
 
 export { runQualityGate } from './quality-gate/gate.js';
 export { loadConfig } from './config-loader.js';

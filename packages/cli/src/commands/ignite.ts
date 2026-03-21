@@ -116,6 +116,10 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
       const icon = status === 'success' ? '✅' : '❌';
       console.log(`   ├─ [${task.team}] ${task.title}  ${icon} (${Math.round(duration / 1000)}s)`);
     },
+    onDryRunConflict: (original: number, split: number, conflicts: string[]) => {
+      logger.warn('wave', 'dry_run_conflict', { original, split, conflicts });
+      console.log(`   ⚠️  Dry Run: ${original} tasks split into ${split} sub-waves to avoid file conflicts`);
+    },
   });
 
   const execTimer = logger.startTimer();
