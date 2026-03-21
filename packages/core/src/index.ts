@@ -25,6 +25,9 @@ export { createBackendTeam } from './teams/backend-team.js';
 export { createQaTeam } from './teams/qa-team.js';
 export { createDesignTeam } from './teams/design-team.js';
 export { createDevopsTeam } from './teams/devops-team.js';
+export { createSecurityTeam } from './teams/security-team.js';
+export { createDocsTeam } from './teams/docs-team.js';
+export { createProductTeam } from './teams/product-team.js';
 
 export { CEOAgent } from './orchestrator/ceo-agent.js';
 export { buildWaves } from './orchestrator/dependency-analyzer.js';

@@ -23,7 +23,7 @@ Each feature should have:
 - Purpose: what it achieves
 
 ## Rules
-- Decompose into tasks assignable to: frontend, backend, qa, design, or devops
+- Decompose into tasks assignable to: frontend, backend, qa, design, devops, security, docs, or product
 - Frontend and backend tasks can often run in parallel
 - QA tasks should depend on the tasks they test
 - Each task description must be detailed enough to implement without clarification
@@ -63,7 +63,7 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
             id: { type: 'string' },
             title: { type: 'string' },
             description: { type: 'string' },
-            team: { type: 'string', enum: ['frontend', 'backend', 'qa', 'design', 'devops'] },
+            team: { type: 'string', enum: ['frontend', 'backend', 'qa', 'design', 'devops', 'security', 'docs', 'product'] },
             featureId: { type: 'string', description: 'Kebab-case feature ID for tracking' },
             dependencies: { type: 'array', items: { type: 'string' } },
             priority: { type: 'string', enum: ['high', 'medium', 'low'] },

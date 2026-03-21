@@ -11,7 +11,7 @@ export interface Task {
   featureId?: string;              // Vibranium feature ID for tracking
 }
 
-export type TeamType = 'frontend' | 'backend' | 'qa' | 'design' | 'devops';
+export type TeamType = 'frontend' | 'backend' | 'qa' | 'design' | 'devops' | 'security' | 'docs' | 'product';
 
 export interface TaskResult {
   taskId: string;

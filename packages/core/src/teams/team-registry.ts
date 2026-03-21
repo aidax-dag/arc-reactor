@@ -5,6 +5,9 @@ import { createBackendTeam } from './backend-team.js';
 import { createQaTeam } from './qa-team.js';
 import { createDesignTeam } from './design-team.js';
 import { createDevopsTeam } from './devops-team.js';
+import { createSecurityTeam } from './security-team.js';
+import { createDocsTeam } from './docs-team.js';
+import { createProductTeam } from './product-team.js';
 
 export class TeamRegistry {
   private teams: Map<TeamType, Team>;
@@ -18,6 +21,9 @@ export class TeamRegistry {
       qa: createQaTeam,
       design: createDesignTeam,
       devops: createDevopsTeam,
+      security: createSecurityTeam,
+      docs: createDocsTeam,
+      product: createProductTeam,
     };
 
     for (const type of enabledTeams) {
