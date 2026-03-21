@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "vibranium": {
+      "command": "node",
+      "args": ["../vibranium/packages/mcp/dist/server.js"],
+      "env": {
+        "VIBRANIUM_API_URL": "http://localhost:3001",
+        "VIBRANIUM_API_KEY": ""
+      }
+    }
+  }
+}
