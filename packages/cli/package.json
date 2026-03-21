@@ -1,11 +1,17 @@
 {
-  "name": "@arc-reactor/cli",
-  "version": "0.1.0",
-  "description": "Arc-Reactor CLI",
+  "name": "arc-reactor",
+  "version": "0.5.0",
+  "description": "AI Company OS — multi-team orchestration engine for product development",
   "bin": {
     "arc-reactor": "dist/index.js"
   },
   "main": "dist/index.js",
+  "keywords": ["ai", "orchestration", "multi-agent", "claude", "product-development"],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aidax-dag/arc-reactor"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
