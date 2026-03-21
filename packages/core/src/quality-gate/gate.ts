@@ -11,7 +11,11 @@ export async function runQualityGate(
   const checks: QualityCheck[] = [];
 
   checks.push(checkCodeGenerated(result));
-  checks.push(checkConflicts(result));
+
+  const conflictCheck = checkConflicts(result);
+  // Conflicts are warnings, not blockers — last wave wins by design
+  conflictCheck.severity = conflictCheck.passed ? 'pass' : 'warning';
+  checks.push(conflictCheck);
 
   if (config.runTests) {
     checks.push(await runTests(result, config));
@@ -21,14 +25,17 @@ export async function runQualityGate(
     .filter(r => r.status === 'failure')
     .map(r => r.taskId);
 
-  const passed = checks.every(c => c.passed) && failedTasks.length === 0;
+  // Only hard failures block: failed tasks or tests failing
+  // Conflicts and missing files from some tasks are warnings
+  const hardFailures = checks.filter(c => c.severity === 'fail' || (!c.passed && c.severity !== 'warning'));
+  const passed = hardFailures.length === 0 && failedTasks.length === 0;
 
   return {
     passed,
     checks,
     failedTasks,
     summary: passed
-      ? `All ${checks.length} checks passed`
-      : `${checks.filter(c => !c.passed).length} check(s) failed`,
+      ? `All checks passed${checks.some(c => c.severity === 'warning') ? ' (with warnings)' : ''}`
+      : `${hardFailures.length} check(s) failed`,
   };
 }

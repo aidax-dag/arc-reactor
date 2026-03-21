@@ -78,7 +78,7 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
   result.qualityReport = report;
 
   for (const check of report.checks) {
-    const icon = check.passed ? '✅' : '❌';
+    const icon = check.severity === 'warning' ? '⚠️' : check.passed ? '✅' : '❌';
     console.log(`   ├─ ${check.name}: ${icon} ${check.details}`);
   }
 

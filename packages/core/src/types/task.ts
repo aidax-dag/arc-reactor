@@ -82,4 +82,5 @@ export interface QualityCheck {
   name: string;
   passed: boolean;
   details: string;
+  severity?: 'pass' | 'fail' | 'warning';
 }

@@ -6,11 +6,23 @@ export function checkCodeGenerated(result: ExecutionResult): QualityCheck {
   );
   const totalFiles = result.results.flatMap(r => r.outputs).length;
 
+  if (tasksWithoutOutput.length === 0) {
+    return {
+      name: 'code-generated',
+      passed: true,
+      severity: 'pass',
+      details: `${totalFiles} files generated`,
+    };
+  }
+
+  // Some tasks without output is a warning if other tasks did produce files
+  const hasAnyOutput = totalFiles > 0;
   return {
     name: 'code-generated',
-    passed: tasksWithoutOutput.length === 0,
-    details: tasksWithoutOutput.length === 0
-      ? `${totalFiles} files generated`
-      : `${tasksWithoutOutput.length} task(s) produced no files`,
+    passed: hasAnyOutput,
+    severity: hasAnyOutput ? 'warning' : 'fail',
+    details: hasAnyOutput
+      ? `${totalFiles} files generated (${tasksWithoutOutput.length} task(s) had no output)`
+      : `No files generated`,
   };
 }

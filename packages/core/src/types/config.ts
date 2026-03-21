@@ -32,7 +32,7 @@ export const DEFAULT_CONFIG: ArcReactorConfig = {
   model: 'claude-sonnet-4-6',
   ceoModel: 'claude-opus-4-6',
 
-  enabledTeams: ['frontend', 'backend', 'qa'],
+  enabledTeams: ['frontend', 'backend', 'qa', 'design', 'devops', 'security', 'docs', 'product'],
 
   maxTaskRetries: 1,
   maxApiRetries: 3,
