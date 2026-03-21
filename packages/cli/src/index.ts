@@ -3,13 +3,16 @@
 import { Command } from 'commander';
 import { ignite } from './commands/ignite.js';
 import { showConfig } from './commands/config.js';
+import { showStatus } from './commands/status.js';
+import { showResumeInfo } from './commands/resume.js';
+import { shutdownExecution } from './commands/shutdown.js';
 
 const program = new Command();
 
 program
   .name('arc-reactor')
   .description('AI Company OS — multi-team orchestration engine')
-  .version('0.1.0');
+  .version('0.5.0');
 
 program
   .command('ignite')
@@ -41,6 +44,21 @@ program
       process.exit(1);
     }
   });
+
+program
+  .command('status')
+  .description('Show current execution progress')
+  .action(() => showStatus());
+
+program
+  .command('resume')
+  .description('Show paused execution info and resume instructions')
+  .action(() => showResumeInfo());
+
+program
+  .command('shutdown')
+  .description('Gracefully stop after current phase completes')
+  .action(() => shutdownExecution());
 
 program
   .command('config')

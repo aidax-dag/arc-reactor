@@ -73,3 +73,16 @@ export { MultiRepoExecutor, validateRepoMap } from './executor/multi-repo.js';
 export type { RepoMap } from './executor/multi-repo.js';
 export { AgentBus, agentBus } from './executor/agent-bus.js';
 export type { AgentMessage } from './executor/agent-bus.js';
+export {
+  createPhaseTracker,
+  updatePhaseStatus,
+  completeExecution,
+  pauseExecution,
+  requestShutdown,
+  isShutdownRequested,
+  getActiveExecution,
+  allPhasesComplete,
+  getRemainingPhases,
+  clearTracker,
+} from './executor/phase-tracker.js';
+export type { PhaseProgress, PhaseStatus } from './executor/phase-tracker.js';
