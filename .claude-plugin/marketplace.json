@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "aidax-dag-arc-reactor",
+  "name": "procastler-crew",
   "description": "Arc-Reactor — AI Company OS multi-team orchestration engine",
   "owner": {
     "name": "Kevin",
