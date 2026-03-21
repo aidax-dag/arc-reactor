@@ -60,3 +60,5 @@ export {
 } from './memory/memory-store.js';
 export type { ExecutionPattern, ProjectContext, Decision, UserPreferences } from './memory/memory-store.js';
 export { learnFromExecution } from './memory/auto-learn.js';
+export { ArcLogger, readLogs, readRunLogs, getLogMetricsForRun } from './logger/logger.js';
+export type { LogEntry, LogLevel, LogCategory, LogMetrics } from './logger/logger.js';
