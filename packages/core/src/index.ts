@@ -67,3 +67,9 @@ export type { ExecutionPattern, ProjectContext, Decision, UserPreferences } from
 export { learnFromExecution } from './memory/auto-learn.js';
 export { ArcLogger, readLogs, readRunLogs, getLogMetricsForRun } from './logger/logger.js';
 export type { LogEntry, LogLevel, LogCategory, LogMetrics } from './logger/logger.js';
+export { submitFeedback, listFeedback, resolveFeedback, buildFeedbackContext } from './feedback/feedback-collector.js';
+export type { UserFeedback } from './feedback/feedback-collector.js';
+export { MultiRepoExecutor, validateRepoMap } from './executor/multi-repo.js';
+export type { RepoMap } from './executor/multi-repo.js';
+export { AgentBus, agentBus } from './executor/agent-bus.js';
+export type { AgentMessage } from './executor/agent-bus.js';
