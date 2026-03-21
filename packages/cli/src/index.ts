@@ -19,7 +19,9 @@ program
   .option('--mode <mode>', 'Executor mode: auto, api, subagent')
   .option('--verbose', 'Enable verbose output')
   .option('--auto-commit', 'Auto-commit generated files after success')
-  .option('--auto-branch', 'Create a feature branch before execution')
+  .option('--auto-branch', 'Create a feature branch (feature/{id})')
+  .option('--create-pr', 'Push branch and create PR after commit')
+  .option('--feature-id <id>', 'Feature ID for branch naming and Vibranium tracking')
   .action(async (goal: string, options: Record<string, string | boolean>) => {
     const config: Record<string, unknown> = {};
     if (options.teams) config.enabledTeams = (options.teams as string).split(',');
@@ -27,6 +29,8 @@ program
     if (options.verbose) config.verbose = true;
     if (options.autoCommit) config.autoCommit = true;
     if (options.autoBranch) config.autoBranch = true;
+    if (options.createPr) config.createPR = true;
+    if (options.featureId) config.featureId = options.featureId;
 
     try {
       await ignite(goal, config as any);

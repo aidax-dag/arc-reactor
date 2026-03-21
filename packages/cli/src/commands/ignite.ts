@@ -97,19 +97,22 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
     }
   }
 
-  // Phase 5: Git operations
+  // Phase 5: Git operations (feature branch → commit → push → PR)
   if (report.passed && (config.autoCommit || config.autoBranch)) {
     const gitResult = autoGit(config.outputDir, result, {
       autoCommit: config.autoCommit,
       autoBranch: config.autoBranch,
       branchPrefix: config.branchPrefix,
-    });
+      createPR: config.createPR,
+    }, config.featureId);
 
-    if (gitResult.branch || gitResult.commit) {
+    if (gitResult.branch || gitResult.commit || gitResult.prUrl) {
       console.log();
       console.log('📦 Git:');
       if (gitResult.branch) console.log(`   ├─ Branch: ${gitResult.branch}`);
       if (gitResult.commit) console.log(`   ├─ Commit: ${gitResult.commit}`);
+      if (gitResult.pushed) console.log(`   ├─ Pushed: ✅`);
+      if (gitResult.prUrl) console.log(`   ├─ PR: ${gitResult.prUrl}`);
     }
   }
 

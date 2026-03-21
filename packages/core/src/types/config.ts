@@ -23,6 +23,8 @@ export interface ArcReactorConfig {
   autoCommit: boolean;
   autoBranch: boolean;
   branchPrefix: string;
+  createPR: boolean;
+  featureId?: string;
 }
 
 export const DEFAULT_CONFIG: ArcReactorConfig = {
@@ -45,5 +47,6 @@ export const DEFAULT_CONFIG: ArcReactorConfig = {
 
   autoCommit: false,
   autoBranch: false,
-  branchPrefix: 'arc-reactor/',
+  branchPrefix: 'feature/',
+  createPR: false,
 };
