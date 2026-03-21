@@ -5,3 +5,4 @@ dist/
 *.tsbuildinfo
 .DS_Store
 .arc-reactor-state.json
+packages/dashboard/.next/
