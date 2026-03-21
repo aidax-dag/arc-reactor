@@ -32,6 +32,7 @@ export { createProductTeam } from './teams/product-team.js';
 export { CEOAgent } from './orchestrator/ceo-agent.js';
 export { buildWaves } from './orchestrator/dependency-analyzer.js';
 export { validateTaskRouting } from './orchestrator/task-router.js';
+export { enforceTeamDependencies, getTaskPhase, TEAM_DEPENDENCIES, TEAM_MIN_PHASE, PHASE_ORDER } from './orchestrator/phase-rules.js';
 
 export type { Executor } from './executor/executor.js';
 export { APIExecutor } from './executor/api-executor.js';
