@@ -99,3 +99,10 @@ export { evaluateRun, loadAllEvaluations, computeCumulativeEvaluation } from './
 export type { TeamScore, RunEvaluation, CumulativeEvaluation } from './evaluation/scorer.js';
 export { generateDebugReport, formatDebugReport } from './evaluation/debug-workflow.js';
 export type { DebugIssue, DebugReport } from './evaluation/debug-workflow.js';
+export { generateTestInfra } from './testing/test-infra.js';
+export { checkContracts, formatContractResults } from './testing/contract-test.js';
+export type { ContractCheckResult } from './testing/contract-test.js';
+export { generateVisualTestScript, runVisualTests, formatVisualResults } from './testing/visual-regression.js';
+export type { VisualTestResult } from './testing/visual-regression.js';
+export { generateDeployScript, generateVercelCanaryConfig, DEFAULT_CANARY_CONFIG } from './deploy/canary.js';
+export type { CanaryConfig, DeploymentResult } from './deploy/canary.js';
