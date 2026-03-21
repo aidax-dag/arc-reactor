@@ -10,7 +10,10 @@
     {
       "name": "arc-reactor",
       "description": "Multi-team AI orchestration engine with 8 teams, Vibranium integration, and production-grade development workflow",
-      "category": "productivity"
+      "category": "productivity",
+      "source": {
+        "source": "inline"
+      }
     }
   ]
 }
