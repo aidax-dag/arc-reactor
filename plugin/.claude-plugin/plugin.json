@@ -1,9 +1,0 @@
-{
-  "name": "arc-reactor",
-  "version": "0.1.0",
-  "description": "AI Company OS — multi-team orchestration engine for product development",
-  "author": {
-    "name": "Kevin"
-  },
-  "keywords": ["orchestration", "multi-agent", "teams", "parallel-execution"]
-}

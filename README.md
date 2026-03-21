@@ -114,9 +114,9 @@ arc-reactor/
 │   │   ├── quality-gate/   # Code check, test runner, conflict detection
 │   │   └── git-ops.ts      # Git workflow (branch, commit, push, PR)
 │   └── cli/                # CLI wrapper (commander)
-├── plugin/                 # Claude Code plugin
+├── plugins/arc-reactor/    # Claude Code plugin (marketplace structure)
 │   ├── agents/             # 10 agent definitions (CEO, Architect, 8 teams)
-│   └── hooks/              # Vibranium hook integration (5 hooks)
+│   └── hooks/              # Vibranium hook integration (6 hooks)
 └── .mcp.json               # Vibranium MCP server config
 ```
 
