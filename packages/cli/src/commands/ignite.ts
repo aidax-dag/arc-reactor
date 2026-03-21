@@ -150,6 +150,10 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
       logger.warn('wave', 'dry_run_conflict', { original, split, conflicts });
       console.log(`   ⚠️  Dry Run: ${original} tasks split into ${split} sub-waves to avoid file conflicts`);
     },
+    onBudgetExceeded: (used: number, limit: number) => {
+      logger.error('system', 'token_budget_exceeded', { used, limit });
+      console.log(`   🔴 Token budget exceeded: ${used.toLocaleString()} / ${limit.toLocaleString()} tokens. Stopping execution.`);
+    },
   });
 
   const execTimer = logger.startTimer();

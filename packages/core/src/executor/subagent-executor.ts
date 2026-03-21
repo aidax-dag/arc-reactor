@@ -36,21 +36,29 @@ export class SubagentExecutor implements Executor {
       const afterFiles = this.scanFiles(context.projectRoot);
       const outputs = this.diffSnapshots(beforeFiles, afterFiles);
 
+      // Estimate tokens: ~4 chars per token for input + output
+      const inputChars = team.systemPrompt.length + taskPrompt.length;
+      const outputChars = stdout.length;
+      const estimatedTokens = Math.round((inputChars + outputChars) / 4);
+
       return {
         taskId: task.id,
         status: 'success',
         outputs,
         summary: stdout.slice(0, 500),
-        tokensUsed: 0,
+        tokensUsed: estimatedTokens,
       };
     } catch (err) {
+      const errMsg = err instanceof Error ? err.message : String(err);
+      const estimatedTokens = Math.round((team.systemPrompt.length + taskPrompt.length + errMsg.length) / 4);
+
       return {
         taskId: task.id,
         status: 'failure',
         outputs: [],
         summary: 'Subagent execution failed',
-        errors: [err instanceof Error ? err.message : String(err)],
-        tokensUsed: 0,
+        errors: [errMsg],
+        tokensUsed: estimatedTokens,
       };
     }
   }

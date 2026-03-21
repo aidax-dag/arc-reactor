@@ -10,6 +10,7 @@ export class WaveExecutor {
   private onWaveStart?: (wave: number, taskCount: number) => void;
   private onTaskComplete?: (taskId: string, status: string, duration: number) => void;
   private onDryRunConflict?: (originalCount: number, splitCount: number, conflicts: string[]) => void;
+  private onBudgetExceeded?: (used: number, limit: number) => void;
 
   constructor(
     config: ArcReactorConfig,
@@ -18,6 +19,7 @@ export class WaveExecutor {
       onWaveStart?: (wave: number, taskCount: number) => void;
       onTaskComplete?: (taskId: string, status: string, duration: number) => void;
       onDryRunConflict?: (originalCount: number, splitCount: number, conflicts: string[]) => void;
+      onBudgetExceeded?: (used: number, limit: number) => void;
     }
   ) {
     this.config = config;
@@ -25,6 +27,7 @@ export class WaveExecutor {
     this.onWaveStart = callbacks?.onWaveStart;
     this.onTaskComplete = callbacks?.onTaskComplete;
     this.onDryRunConflict = callbacks?.onDryRunConflict;
+    this.onBudgetExceeded = callbacks?.onBudgetExceeded;
   }
 
   async execute(plan: ExecutionPlan, executor: Executor): Promise<ExecutionResult> {
@@ -67,6 +70,13 @@ export class WaveExecutor {
         );
 
         results.push(...waveResults);
+
+        // Token budget check
+        const totalTokensSoFar = results.reduce((sum, r) => sum + r.tokensUsed, 0);
+        if (this.config.maxTotalTokens > 0 && totalTokensSoFar > this.config.maxTotalTokens) {
+          this.onBudgetExceeded?.(totalTokensSoFar, this.config.maxTotalTokens);
+          break;
+        }
 
         // Retry failures
         const failures = waveResults.filter(r => r.status === 'failure');

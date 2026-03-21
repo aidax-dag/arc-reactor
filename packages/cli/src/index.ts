@@ -6,6 +6,8 @@ import { showConfig } from './commands/config.js';
 import { showStatus } from './commands/status.js';
 import { showResumeInfo } from './commands/resume.js';
 import { shutdownExecution } from './commands/shutdown.js';
+import { showLogs } from './commands/logs.js';
+import { showEvaluation } from './commands/eval.js';
 
 const program = new Command();
 
@@ -59,6 +61,21 @@ program
   .command('shutdown')
   .description('Gracefully stop after current phase completes')
   .action(() => shutdownExecution());
+
+program
+  .command('logs')
+  .description('View execution logs and metrics')
+  .option('--run <id>', 'Show logs for a specific run')
+  .option('--category <cat>', 'Filter by category (ceo, team, wave, quality, etc.)')
+  .option('--level <level>', 'Filter by level (debug, info, warn, error)')
+  .option('--limit <n>', 'Max entries to show')
+  .action((options: Record<string, string>) => showLogs(options));
+
+program
+  .command('eval')
+  .description('View team evaluation scores and improvement suggestions')
+  .option('--cumulative', 'Show cumulative analysis across all runs')
+  .action((options: Record<string, boolean>) => showEvaluation(options));
 
 program
   .command('config')
