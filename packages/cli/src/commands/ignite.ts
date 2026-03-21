@@ -25,6 +25,10 @@ import {
   updatePhaseStatus,
   completeExecution as completeTrackerExecution,
   isShutdownRequested,
+  generateDesignDoc,
+  evaluateRun,
+  generateDebugReport,
+  formatDebugReport,
 } from '@arc-reactor/core';
 import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
@@ -105,10 +109,12 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
 
   validateTaskRouting(plan.tasks, teamRegistry);
 
-  // Create plan documents + phase tracker
+  // Create plan documents + Design Doc + phase tracker
   createPlanIndex(config.outputDir, plan);
+  const designDocPath = generateDesignDoc(config.outputDir, plan);
   createPhaseTracker(run.id, goal, config.outputDir, plan);
   console.log(`📄 Plan: .arc-reactor/plan.md`);
+  console.log(`📐 Design Doc: .arc-reactor/design-doc.md`);
 
   // Phase 2: Execute waves
   const executor = selectExecutor(config, logger);
@@ -258,16 +264,35 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
     retryCount: metrics.retryCount,
   });
 
+  // Phase 7: Evaluation (team scoring)
+  const evaluation = evaluateRun(result);
+  console.log();
+  console.log(`📊 Evaluation: Overall Score ${evaluation.overallScore}/100`);
+  for (const ts of evaluation.teamScores) {
+    const grade = ts.overallScore >= 80 ? '🟢' : ts.overallScore >= 60 ? '🟡' : '🔴';
+    console.log(`   ${grade} [${ts.team}] ${ts.overallScore}/100 (plan: ${ts.planAccuracy}, quality: ${ts.codeQuality}, speed: ${ts.deliverySpeed}, tokens: ${ts.tokenEfficiency})`);
+  }
+  console.log(`   Plan accuracy: ${evaluation.planVsResult.accuracy}% (${evaluation.planVsResult.completedTasks}/${evaluation.planVsResult.plannedTasks} tasks)`);
+
+  // Phase 8: Debug report (if issues found)
+  const failedResults = result.results.filter(r => r.status === 'failure');
+  const failedChecks = report.checks.filter(c => !c.passed && c.severity !== 'warning');
+  if (failedResults.length > 0 || failedChecks.length > 0) {
+    const debugReport = generateDebugReport(run.id, goal, failedResults, report.checks, plan.tasks);
+    console.log(formatDebugReport(debugReport));
+  }
+
   // Save run result
   completeRun(run.id, result, report.passed);
   console.log();
-  console.log(`📝 Run saved: ${run.id} (learnings captured)`);
+  console.log(`📝 Run saved: ${run.id} (learnings + evaluation captured)`);
   console.log(`📊 Logs: ~/.arc-reactor/logs/`);
+  console.log(`📊 Evaluations: ~/.arc-reactor/evaluations/`);
 
-  // Phase 7: Notifications
+  // Phase 9: Notifications
   const notifEvent = report.passed ? 'run_complete' : 'run_failed';
   await sendNotification(notifEvent, run.id, result, config);
-  if (!report.passed && report.checks.some(c => !c.passed && c.severity !== 'warning')) {
+  if (!report.passed && report.checks.some((c: { passed: boolean; severity?: string }) => !c.passed && c.severity !== 'warning')) {
     await sendNotification('quality_gate_failed', run.id, result, config);
   }
 

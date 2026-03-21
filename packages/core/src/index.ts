@@ -94,3 +94,8 @@ export {
   updateCurrentPhaseTask,
   completeCurrentPhase,
 } from './plan-manager/plan-writer.js';
+export { generateDesignDoc } from './plan-manager/design-doc.js';
+export { evaluateRun, loadAllEvaluations, computeCumulativeEvaluation } from './evaluation/scorer.js';
+export type { TeamScore, RunEvaluation, CumulativeEvaluation } from './evaluation/scorer.js';
+export { generateDebugReport, formatDebugReport } from './evaluation/debug-workflow.js';
+export type { DebugIssue, DebugReport } from './evaluation/debug-workflow.js';
