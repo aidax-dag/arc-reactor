@@ -9,6 +9,8 @@ import {
   runQualityGate,
   validateTaskRouting,
   autoGit,
+  createRun,
+  completeRun,
 } from '@arc-reactor/core';
 import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
@@ -40,6 +42,7 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
   console.log();
 
   const config = loadConfig(cliOptions);
+  const run = createRun(goal);
   const teamRegistry = new TeamRegistry(config.enabledTeams);
 
   // Phase 1: CEO Analysis
@@ -115,6 +118,11 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
       if (gitResult.prUrl) console.log(`   ├─ PR: ${gitResult.prUrl}`);
     }
   }
+
+  // Save run result
+  completeRun(run.id, result, report.passed);
+  console.log();
+  console.log(`📝 Run saved: ${run.id}`);
 
   if (!report.passed) {
     process.exitCode = 1;
