@@ -45,3 +45,18 @@ export { autoGit, commitResults, initGitIfNeeded, createFeatureBranch, pushBranc
 export type { GitOpsConfig } from './git-ops.js';
 export { createRun, updateRun, completeRun, getRun, listRuns, getRunDetail } from './run-store.js';
 export type { StoredRun } from './run-store.js';
+export {
+  buildMemoryContext,
+  loadGlobalPatterns,
+  saveGlobalPattern,
+  loadProjectContext,
+  saveProjectContext,
+  updateProjectContext,
+  addDecision,
+  loadProjectLearnings,
+  saveProjectLearning,
+  loadPreferences,
+  updatePreferences,
+} from './memory/memory-store.js';
+export type { ExecutionPattern, ProjectContext, Decision, UserPreferences } from './memory/memory-store.js';
+export { learnFromExecution } from './memory/auto-learn.js';

@@ -11,6 +11,8 @@ import {
   autoGit,
   createRun,
   completeRun,
+  buildMemoryContext,
+  learnFromExecution,
 } from '@arc-reactor/core';
 import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
@@ -45,10 +47,19 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
   const run = createRun(goal);
   const teamRegistry = new TeamRegistry(config.enabledTeams);
 
+  // Phase 0: Load memory context
+  const memoryContext = buildMemoryContext(config.outputDir);
+  if (memoryContext) {
+    console.log('🧠 Memory loaded (past learnings + project context)');
+  }
+
   // Phase 1: CEO Analysis
   console.log('🧠 CEO Agent analyzing goal...');
   const ceo = new CEOAgent(config);
-  const plan = await ceo.analyze(goal);
+  const goalWithMemory = memoryContext
+    ? `${goal}\n\n--- Context from past executions ---\n${memoryContext}`
+    : goal;
+  const plan = await ceo.analyze(goalWithMemory);
 
   console.log(`   Components: ${plan.analysis.components.join(', ')}`);
   console.log(`   Complexity: ${plan.estimatedComplexity}`);
@@ -119,10 +130,13 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
     }
   }
 
+  // Phase 6: Learn from execution
+  learnFromExecution(config.outputDir, result);
+
   // Save run result
   completeRun(run.id, result, report.passed);
   console.log();
-  console.log(`📝 Run saved: ${run.id}`);
+  console.log(`📝 Run saved: ${run.id} (learnings captured)`);
 
   if (!report.passed) {
     process.exitCode = 1;
