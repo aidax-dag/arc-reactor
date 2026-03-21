@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "aidax-dag-arc-reactor",
+  "description": "Arc-Reactor — AI Company OS multi-team orchestration engine",
+  "owner": {
+    "name": "Kevin",
+    "email": "kevin.dev201@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "arc-reactor",
+      "description": "Multi-team AI orchestration engine with 8 teams, Vibranium integration, and production-grade development workflow",
+      "category": "productivity"
+    }
+  ]
+}
