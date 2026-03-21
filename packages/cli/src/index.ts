@@ -18,11 +18,15 @@ program
   .option('--teams <teams>', 'Comma-separated team list')
   .option('--mode <mode>', 'Executor mode: auto, api, subagent')
   .option('--verbose', 'Enable verbose output')
+  .option('--auto-commit', 'Auto-commit generated files after success')
+  .option('--auto-branch', 'Create a feature branch before execution')
   .action(async (goal: string, options: Record<string, string | boolean>) => {
     const config: Record<string, unknown> = {};
     if (options.teams) config.enabledTeams = (options.teams as string).split(',');
     if (options.mode) config.mode = options.mode;
     if (options.verbose) config.verbose = true;
+    if (options.autoCommit) config.autoCommit = true;
+    if (options.autoBranch) config.autoBranch = true;
 
     try {
       await ignite(goal, config as any);

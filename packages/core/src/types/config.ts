@@ -18,6 +18,11 @@ export interface ArcReactorConfig {
 
   outputDir: string;
   verbose: boolean;
+
+  // Git
+  autoCommit: boolean;
+  autoBranch: boolean;
+  branchPrefix: string;
 }
 
 export const DEFAULT_CONFIG: ArcReactorConfig = {
@@ -37,4 +42,8 @@ export const DEFAULT_CONFIG: ArcReactorConfig = {
 
   outputDir: process.cwd(),
   verbose: false,
+
+  autoCommit: false,
+  autoBranch: false,
+  branchPrefix: 'arc-reactor/',
 };

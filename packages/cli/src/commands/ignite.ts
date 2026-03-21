@@ -8,6 +8,7 @@ import {
   isClaudeCodeEnvironment,
   runQualityGate,
   validateTaskRouting,
+  autoGit,
 } from '@arc-reactor/core';
 import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
@@ -93,6 +94,22 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
       for (const f of r.outputs) {
         console.log(`   ├─ ${f.path}`);
       }
+    }
+  }
+
+  // Phase 5: Git operations
+  if (report.passed && (config.autoCommit || config.autoBranch)) {
+    const gitResult = autoGit(config.outputDir, result, {
+      autoCommit: config.autoCommit,
+      autoBranch: config.autoBranch,
+      branchPrefix: config.branchPrefix,
+    });
+
+    if (gitResult.branch || gitResult.commit) {
+      console.log();
+      console.log('📦 Git:');
+      if (gitResult.branch) console.log(`   ├─ Branch: ${gitResult.branch}`);
+      if (gitResult.commit) console.log(`   ├─ Commit: ${gitResult.commit}`);
     }
   }
 

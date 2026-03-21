@@ -37,3 +37,5 @@ export { WaveExecutor } from './executor/wave-executor.js';
 
 export { runQualityGate } from './quality-gate/gate.js';
 export { loadConfig } from './config-loader.js';
+export { autoGit, commitResults, initGitIfNeeded, createBranch } from './git-ops.js';
+export type { GitOpsConfig } from './git-ops.js';
