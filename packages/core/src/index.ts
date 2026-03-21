@@ -86,3 +86,11 @@ export {
   clearTracker,
 } from './executor/phase-tracker.js';
 export type { PhaseProgress, PhaseStatus } from './executor/phase-tracker.js';
+export {
+  createPlanIndex,
+  updatePlanIndex,
+  finalizePlanIndex,
+  writeCurrentPhase,
+  updateCurrentPhaseTask,
+  completeCurrentPhase,
+} from './plan-manager/plan-writer.js';

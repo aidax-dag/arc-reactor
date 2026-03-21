@@ -15,6 +15,16 @@ import {
   learnFromExecution,
   ArcLogger,
   sendNotification,
+  createPlanIndex,
+  updatePlanIndex,
+  finalizePlanIndex,
+  writeCurrentPhase,
+  updateCurrentPhaseTask,
+  completeCurrentPhase,
+  createPhaseTracker,
+  updatePhaseStatus,
+  completeExecution as completeTrackerExecution,
+  isShutdownRequested,
 } from '@arc-reactor/core';
 import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
@@ -95,14 +105,25 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
 
   validateTaskRouting(plan.tasks, teamRegistry);
 
+  // Create plan documents + phase tracker
+  createPlanIndex(config.outputDir, plan);
+  createPhaseTracker(run.id, goal, config.outputDir, plan);
+  console.log(`📄 Plan: .arc-reactor/plan.md`);
+
   // Phase 2: Execute waves
   const executor = selectExecutor(config, logger);
 
+  let currentWave = 0;
   const waveExecutor = new WaveExecutor(config, teamRegistry, {
     onWaveStart: (wave: number, count: number) => {
+      currentWave = wave;
       const label = count > 1 ? 'parallel' : `${count} task`;
       logger.info('wave', 'wave_started', { wave, taskCount: count });
       console.log(`⚡ Wave ${wave} (${label}):`);
+
+      // Write current phase doc + update tracker
+      writeCurrentPhase(config.outputDir, plan, wave);
+      updatePhaseStatus(wave, 'running');
     },
     onTaskComplete: (taskId: string, status: string, duration: number) => {
       const task = plan.tasks.find((t: { id: string }) => t.id === taskId)!;
@@ -115,6 +136,9 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
       });
       const icon = status === 'success' ? '✅' : '❌';
       console.log(`   ├─ [${task.team}] ${task.title}  ${icon} (${Math.round(duration / 1000)}s)`);
+
+      // Update current-phase.md with task result
+      updateCurrentPhaseTask(config.outputDir, taskId, status as 'success' | 'failure', '', [], duration);
     },
     onDryRunConflict: (original: number, split: number, conflicts: string[]) => {
       logger.warn('wave', 'dry_run_conflict', { original, split, conflicts });
@@ -130,10 +154,17 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
     totalTokensUsed: result.totalTokensUsed,
   });
 
-  // Log wave completion metrics
+  // Update plan docs for each completed wave
   for (const wave of plan.waves) {
-    const waveTasks = wave.taskIds.map(id => result.results.find(r => r.taskId === id)!);
-    const waveDuration = Math.max(...waveTasks.map(t => 0)); // Approximation
+    const waveResults = wave.taskIds
+      .map(id => result.results.find(r => r.taskId === id))
+      .filter(Boolean) as typeof result.results;
+    const filesCreated = waveResults.flatMap(r => r.outputs.map(o => o.path));
+
+    completeCurrentPhase(config.outputDir, wave.order, waveResults);
+    updatePlanIndex(config.outputDir, wave.order, plan.waves.length, filesCreated, result.durationMs);
+    updatePhaseStatus(wave.order, 'completed');
+
     logger.info('wave', 'wave_complete', {
       wave: wave.order,
       taskCount: wave.taskIds.length,
@@ -163,6 +194,11 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
     passed: report.passed,
     summary: report.summary,
   });
+
+  // Finalize plan.md
+  const totalFiles = result.results.flatMap(r => r.outputs).length;
+  finalizePlanIndex(config.outputDir, totalFiles, result.totalTokensUsed, result.durationMs, report);
+  completeTrackerExecution();
 
   // Phase 4: Summary
   console.log();
