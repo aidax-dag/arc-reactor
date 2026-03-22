@@ -8,6 +8,7 @@ import { showResumeInfo } from './commands/resume.js';
 import { shutdownExecution } from './commands/shutdown.js';
 import { showLogs } from './commands/logs.js';
 import { showEvaluation } from './commands/eval.js';
+import { verifyExecution } from './commands/verify.js';
 
 const program = new Command();
 
@@ -76,6 +77,13 @@ program
   .description('View team evaluation scores and improvement suggestions')
   .option('--cumulative', 'Show cumulative analysis across all runs')
   .action((options: Record<string, boolean>) => showEvaluation(options));
+
+program
+  .command('verify')
+  .description('Verify that AI agents actually called the right tools (anti-hallucination)')
+  .option('--session <id>', 'Filter by session ID')
+  .option('--run <id>', 'Filter by run ID')
+  .action((options: Record<string, string>) => verifyExecution(options));
 
 program
   .command('config')

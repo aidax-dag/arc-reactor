@@ -106,3 +106,11 @@ export { generateVisualTestScript, runVisualTests, formatVisualResults } from '.
 export type { VisualTestResult } from './testing/visual-regression.js';
 export { generateDeployScript, generateVercelCanaryConfig, DEFAULT_CANARY_CONFIG } from './deploy/canary.js';
 export type { CanaryConfig, DeploymentResult } from './deploy/canary.js';
+export {
+  startTrace, recordToolCall, completeTrace,
+  verifyTrace, verifyAllTraces, formatVerificationResults,
+  loadTrace, DEFAULT_TEAM_ASSERTIONS,
+} from './verification/execution-trace.js';
+export type { ToolCall, ExecutionTrace, ToolAssertion, AssertionResult } from './verification/execution-trace.js';
+export { buildMCPExpectations, verifyMCPCalls, formatMCPVerification } from './verification/mcp-verifier.js';
+export type { MCPExpectation, MCPVerificationResult } from './verification/mcp-verifier.js';
