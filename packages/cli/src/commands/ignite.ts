@@ -1,6 +1,6 @@
 import {
   loadConfig,
-  CEOAgent,
+  Director,
   TeamRegistry,
   WaveExecutor,
   APIExecutor,
@@ -92,16 +92,16 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
   }
 
   // Phase 1: CEO Analysis
-  console.log('🧠 CEO Agent analyzing goal...');
-  const ceoTimer = logger.startTimer();
-  const ceo = new CEOAgent(config);
+  console.log('🧠 Director analyzing goal...');
+  const directorTimer = logger.startTimer();
+  const director = new Director(config);
   const goalWithMemory = memoryContext
     ? `${goal}\n\n--- Context from past executions ---\n${memoryContext}`
     : goal;
-  const plan = await ceo.analyze(goalWithMemory);
+  const plan = await director.analyze(goalWithMemory);
 
-  logger.info('ceo', 'analysis_complete', {
-    durationMs: ceoTimer(),
+  logger.info('director', 'analysis_complete', {
+    durationMs: directorTimer(),
     complexity: plan.estimatedComplexity,
     taskCount: plan.tasks.length,
     waveCount: plan.waves.length,

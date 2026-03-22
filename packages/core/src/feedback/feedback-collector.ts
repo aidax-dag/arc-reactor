@@ -66,7 +66,7 @@ export function resolveFeedback(id: string): void {
 }
 
 /**
- * Build feedback summary for CEO Agent context.
+ * Build feedback summary for Director context.
  * Includes unresolved feedback from past runs so the agent can learn.
  */
 export function buildFeedbackContext(): string {

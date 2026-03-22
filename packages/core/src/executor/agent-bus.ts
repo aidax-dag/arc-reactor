@@ -2,7 +2,7 @@
  * Agent Message Bus — real-time communication between team agents.
  *
  * Enables agents to share context, ask questions, and coordinate
- * without going through the CEO Agent.
+ * without going through the Director.
  *
  * Use cases:
  * - Frontend asks Backend: "What's the API response shape for /api/users?"

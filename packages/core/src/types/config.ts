@@ -4,7 +4,7 @@ export interface ArcReactorConfig {
   mode: 'auto' | 'api' | 'subagent';
   apiKey?: string;
   model: string;
-  ceoModel: string;
+  directorModel: string;
 
   enabledTeams: TeamType[];
 
@@ -37,7 +37,7 @@ export interface ArcReactorConfig {
 export const DEFAULT_CONFIG: ArcReactorConfig = {
   mode: 'subagent',
   model: 'claude-sonnet-4-6',
-  ceoModel: 'claude-opus-4-6',
+  directorModel: 'claude-opus-4-6',
 
   enabledTeams: ['frontend', 'backend', 'qa', 'design', 'devops', 'security', 'docs', 'product'],
 

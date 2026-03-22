@@ -9,7 +9,7 @@ const LOG_DIR = join(homedir(), '.arc-reactor', 'logs');
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 export type LogCategory =
-  | 'ceo'           // CEO Agent analysis
+  | 'director'      // Director analysis
   | 'team'          // Team execution
   | 'wave'          // Wave orchestration
   | 'quality'       // Quality gate

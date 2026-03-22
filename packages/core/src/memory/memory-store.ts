@@ -196,7 +196,7 @@ export function saveProjectLearning(projectPath: string, pattern: Omit<Execution
   writeJson(projectLearningsPath(hash), learnings.slice(0, 100));
 }
 
-// --- Memory Summary for CEO Agent ---
+// --- Memory Summary for Director ---
 
 export function buildMemoryContext(projectPath: string): string {
   const globalPatterns = loadGlobalPatterns();

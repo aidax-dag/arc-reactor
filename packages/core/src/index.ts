@@ -29,7 +29,7 @@ export { createSecurityTeam } from './teams/security-team.js';
 export { createDocsTeam } from './teams/docs-team.js';
 export { createProductTeam } from './teams/product-team.js';
 
-export { CEOAgent } from './orchestrator/ceo-agent.js';
+export { Director } from './orchestrator/director.js';
 export { buildWaves } from './orchestrator/dependency-analyzer.js';
 export { validateTaskRouting } from './orchestrator/task-router.js';
 export { enforceTeamDependencies, getTaskPhase, TEAM_DEPENDENCIES, TEAM_MIN_PHASE, PHASE_ORDER } from './orchestrator/phase-rules.js';

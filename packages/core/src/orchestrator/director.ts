@@ -4,7 +4,7 @@ import type { ExecutionPlan } from '../types/task.js';
 import type { ArcReactorConfig } from '../types/config.js';
 import { parseExecutionPlan } from './task-decomposer.js';
 
-const CEO_SYSTEM_PROMPT = `You are the CEO Agent of Arc-Reactor, an AI orchestration engine.
+const DIRECTOR_SYSTEM_PROMPT = `You are the Director of Arc-Reactor, an AI orchestration engine.
 
 Given a goal, analyze it and produce a structured execution plan.
 
@@ -77,7 +77,7 @@ const SUBMIT_PLAN_TOOL: Anthropic.Tool = {
   },
 };
 
-const CEO_SUBAGENT_PROMPT = `${CEO_SYSTEM_PROMPT}
+const DIRECTOR_SUBAGENT_PROMPT = `${DIRECTOR_SYSTEM_PROMPT}
 
 You MUST respond with ONLY a valid JSON object (no markdown, no explanation, no code fences).
 The JSON must have these fields:
@@ -88,7 +88,7 @@ The JSON must have these fields:
 - estimatedComplexity ("simple" | "medium" | "complex")
 - tasks (array of objects with: id, title, description, team, dependencies, priority, acceptanceCriteria)`;
 
-export class CEOAgent {
+export class Director {
   private config: ArcReactorConfig;
   private client?: Anthropic;
 
@@ -112,9 +112,9 @@ export class CEOAgent {
     }
 
     const response = await this.client.messages.create({
-      model: this.config.ceoModel,
+      model: this.config.directorModel,
       max_tokens: 4096,
-      system: CEO_SYSTEM_PROMPT,
+      system: DIRECTOR_SYSTEM_PROMPT,
       tools: [SUBMIT_PLAN_TOOL],
       tool_choice: { type: 'tool', name: 'submit_plan' },
       messages: [{ role: 'user', content: `Goal: ${goal}` }],
@@ -125,7 +125,7 @@ export class CEOAgent {
     );
 
     if (!toolUse) {
-      throw new Error('CEO Agent did not return a plan. Try rephrasing your goal.');
+      throw new Error('Director did not return a plan. Try rephrasing your goal.');
     }
 
     return parseExecutionPlan(goal, toolUse.input as Record<string, unknown>);
@@ -136,7 +136,7 @@ export class CEOAgent {
 
     const stdout = execFileSync('claude', [
       '--print',
-      '--system-prompt', CEO_SUBAGENT_PROMPT,
+      '--system-prompt', DIRECTOR_SUBAGENT_PROMPT,
       prompt,
     ], {
       encoding: 'utf-8',
@@ -155,7 +155,7 @@ export class CEOAgent {
     try {
       raw = JSON.parse(jsonStr);
     } catch {
-      throw new Error(`CEO Agent returned invalid JSON. Output:\n${stdout.slice(0, 500)}`);
+      throw new Error(`Director returned invalid JSON. Output:\n${stdout.slice(0, 500)}`);
     }
 
     return parseExecutionPlan(goal, raw);

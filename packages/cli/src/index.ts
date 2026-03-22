@@ -67,7 +67,7 @@ program
   .command('logs')
   .description('View execution logs and metrics')
   .option('--run <id>', 'Show logs for a specific run')
-  .option('--category <cat>', 'Filter by category (ceo, team, wave, quality, etc.)')
+  .option('--category <cat>', 'Filter by category (director, team, wave, quality, etc.)')
   .option('--level <level>', 'Filter by level (debug, info, warn, error)')
   .option('--limit <n>', 'Max entries to show')
   .action((options: Record<string, string>) => showLogs(options));
