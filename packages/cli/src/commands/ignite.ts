@@ -29,7 +29,13 @@ import {
   evaluateRun,
   generateDebugReport,
   formatDebugReport,
+  startTrace,
+  recordToolCall,
+  completeTrace,
+  verifyAllTraces,
+  formatVerificationResults,
 } from '@arc-reactor/core';
+import type { ExecutionTrace } from '@arc-reactor/core';
 import type { ArcReactorConfig } from '@arc-reactor/core';
 import type { Executor } from '@arc-reactor/core';
 
@@ -127,9 +133,18 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
       logger.info('wave', 'wave_started', { wave, taskCount: count });
       console.log(`⚡ Wave ${wave} (${label}):`);
 
-      // Write current phase doc + update tracker
+      // Write current phase doc + update tracker + start traces
       writeCurrentPhase(config.outputDir, plan, wave);
       updatePhaseStatus(wave, 'running');
+
+      // Start execution trace for each task in this wave
+      const waveObj = plan.waves.find(w => w.order === wave);
+      if (waveObj) {
+        for (const tid of waveObj.taskIds) {
+          const t = plan.tasks.find(t2 => t2.id === tid);
+          if (t) startTrace(run.id, tid, t.team);
+        }
+      }
     },
     onTaskComplete: (taskId: string, status: string, duration: number) => {
       const task = plan.tasks.find((t: { id: string }) => t.id === taskId)!;
@@ -142,6 +157,9 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
       });
       const icon = status === 'success' ? '✅' : '❌';
       console.log(`   ├─ [${task.team}] ${task.title}  ${icon} (${Math.round(duration / 1000)}s)`);
+
+      // Complete trace for this task
+      completeTrace(taskId);
 
       // Update current-phase.md with task result
       updateCurrentPhaseTask(config.outputDir, taskId, status as 'success' | 'failure', '', [], duration);
@@ -286,10 +304,29 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
     console.log(formatDebugReport(debugReport));
   }
 
+  // Phase 8.5: Automatic execution verification (anti-hallucination)
+  const traces: ExecutionTrace[] = [];
+  for (const task of plan.tasks) {
+    const trace = completeTrace(task.id);
+    if (trace) traces.push(trace);
+  }
+
+  if (traces.length > 0) {
+    const verification = verifyAllTraces(run.id, traces);
+    console.log(formatVerificationResults(verification.results));
+
+    if (!verification.passed) {
+      logger.warn('system', 'verification_failed', {
+        summary: verification.summary,
+        failedTasks: verification.results.filter(r => !r.passed).map(r => r.taskId),
+      });
+    }
+  }
+
   // Save run result
   completeRun(run.id, result, report.passed);
   console.log();
-  console.log(`📝 Run saved: ${run.id} (learnings + evaluation captured)`);
+  console.log(`📝 Run saved: ${run.id} (learnings + evaluation + verification)`);
   console.log(`📊 Logs: ~/.arc-reactor/logs/`);
   console.log(`📊 Evaluations: ~/.arc-reactor/evaluations/`);
 
