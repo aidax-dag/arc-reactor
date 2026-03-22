@@ -91,7 +91,7 @@ export async function ignite(goal: string, cliOptions: Partial<ArcReactorConfig>
     console.log('🧠 Memory loaded (past learnings + project context)');
   }
 
-  // Phase 1: CEO Analysis
+  // Phase 1: Director Analysis
   console.log('🧠 Director analyzing goal...');
   const directorTimer = logger.startTimer();
   const director = new Director(config);
