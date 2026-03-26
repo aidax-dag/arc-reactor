@@ -12,7 +12,7 @@ Inspired by Iron Man's Arc Reactor — a single power source that runs everythin
 You: "Build a login page with email/password auth"
          │
          ▼
-    CEO Agent (Opus)
+    Director (Opus)
     ├── Analyzes goal
     ├── Identifies features (planning → dev-level)
     └── Creates execution plan with waves
@@ -108,14 +108,14 @@ arc-reactor config --set model=claude-sonnet-4-6  # Set a value
 arc-reactor/
 ├── packages/
 │   ├── core/               # Standalone orchestration engine
-│   │   ├── orchestrator/   # CEO Agent, Architect, task decomposition, wave scheduling
+│   │   ├── orchestrator/   # Director, Architect, task decomposition, wave scheduling
 │   │   ├── teams/          # 8 team definitions (Frontend, Backend, QA, Design, DevOps, Security, Docs, Product)
 │   │   ├── executor/       # Dual executor: subagent (default) + API
 │   │   ├── quality-gate/   # Code check, test runner, conflict detection
 │   │   └── git-ops.ts      # Git workflow (branch, commit, push, PR)
 │   └── cli/                # CLI wrapper (commander)
 ├── plugins/arc-reactor/    # Claude Code plugin (marketplace structure)
-│   ├── agents/             # 10 agent definitions (CEO, Architect, 8 teams)
+│   ├── agents/             # 10 agent definitions (Director, Architect, 8 teams)
 │   └── hooks/              # Vibranium hook integration (6 hooks)
 └── .mcp.json               # Vibranium MCP server config
 ```
@@ -143,7 +143,7 @@ arc-reactor/
 
 ### Architect Agent
 
-The Architect agent reviews the CEO's execution plan before task dispatch:
+The Architect agent reviews the Director's execution plan before task dispatch:
 - Cross-cutting concern identification
 - Architecture consistency checks
 - Dependency validation
@@ -160,7 +160,7 @@ arc-reactor ignite "Add payment integration" \
   --create-pr         # Pushes and opens a PR
 ```
 
-Feature tracking with `--feature-id` flows through the entire pipeline — from CEO planning to Vibranium hook sync.
+Feature tracking with `--feature-id` flows through the entire pipeline — from Director planning to Vibranium hook sync.
 
 ### Vibranium Hook Integration
 
@@ -192,7 +192,7 @@ Config is loaded with priority: CLI flags > `.arc-reactor.json` > `~/.arc-reacto
 {
   "mode": "subagent",
   "model": "claude-sonnet-4-6",
-  "ceoModel": "claude-opus-4-6",
+  "directorModel": "claude-opus-4-6",
   "enabledTeams": ["frontend", "backend", "qa"],
   "maxTaskRetries": 1,
   "maxApiRetries": 3,
@@ -217,7 +217,7 @@ claude plugin add /path/to/arc-reactor/plugin
 ```
 
 **Agents available:**
-- `arc-reactor-ceo` — Goal analysis and task decomposition (Opus)
+- `arc-reactor-director` — Goal analysis and task decomposition (Opus)
 - `arc-reactor-architect` — Architecture review and cross-cutting concerns (Opus)
 - `arc-reactor-frontend` — UI implementation (Sonnet)
 - `arc-reactor-backend` — API implementation (Sonnet)
