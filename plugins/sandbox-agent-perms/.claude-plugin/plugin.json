@@ -1,0 +1,9 @@
+{
+  "name": "sandbox-agent-perms",
+  "version": "1.0.0",
+  "description": "Agent 도구 호출 시 CWD에 대한 임시 권한을 자동 부여/회수하는 샌드박스 플러그인",
+  "author": {
+    "name": "Kevin"
+  },
+  "keywords": ["sandbox", "permissions", "subagent", "security"]
+}

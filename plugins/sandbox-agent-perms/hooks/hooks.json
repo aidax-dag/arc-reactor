@@ -1,0 +1,29 @@
+{
+  "description": "Sandbox Agent Perms — Agent 도구 호출 시 CWD 권한 자동 부여/회수",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/grant-perms.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/scripts/revoke-perms.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
