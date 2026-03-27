@@ -11,10 +11,41 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const ARC_REACTOR_PERMISSIONS = [
+  // ── Build & Runtime ──
   'Bash(mkdir:*)',
   'Bash(node:*)',
   'Bash(npm:*)',
   'Bash(npx:*)',
+  'Bash(tsc:*)',
+  'Bash(eslint:*)',
+
+  // ── Git & GitHub (post-capture-pr.js, agents) ──
+  'Bash(git:*)',
+  'Bash(gh:*)',
+
+  // ── Testing (QA agent) ──
+  'Bash(jest:*)',
+  'Bash(vitest:*)',
+  'Bash(playwright:*)',
+
+  // ── DevOps (devops agent) ──
+  'Bash(docker:*)',
+  'Bash(docker-compose:*)',
+
+  // ── File Operations (agents, cleanup) ──
+  'Bash(cat:*)',
+  'Bash(ls:*)',
+  'Bash(rm:*)',
+  'Bash(cp:*)',
+  'Bash(mv:*)',
+  'Bash(chmod:*)',
+  'Bash(find:*)',
+  'Bash(wc:*)',
+  'Bash(head:*)',
+  'Bash(tail:*)',
+  'Bash(curl:*)',
+
+  // ── Source Code Files ──
   'Write(*.md)',
   'Write(*.txt)',
   'Write(*.json)',
@@ -24,6 +55,20 @@ const ARC_REACTOR_PERMISSIONS = [
   'Write(*.jsx)',
   'Write(*.css)',
   'Write(*.html)',
+
+  // ── Config & Infrastructure (devops, backend agents) ──
+  'Write(*.yaml)',
+  'Write(*.yml)',
+  'Write(*.toml)',
+  'Write(*.sh)',
+  'Write(*.sql)',
+  'Write(*.graphql)',
+  'Write(*.prisma)',
+  'Write(*.lock)',
+  'Write(Dockerfile)',
+  'Write(.dockerignore)',
+  'Write(.gitignore)',
+  'Write(.env.example)',
 ];
 
 function main() {
